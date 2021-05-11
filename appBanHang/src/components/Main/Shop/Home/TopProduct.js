@@ -1,112 +1,114 @@
-import React, { Component } from 'react';
-import { 
-    View, Text, Image, StyleSheet, Dimensions, TouchableOpacity, ListView 
-} from 'react-native';
+import React, {Component} from 'react';
+import {Text, StyleSheet, View, Dimensions, Image} from 'react-native';
+import {FlatList, TouchableOpacity} from 'react-native-gesture-handler';
 
-const url = 'http://localhost/api/images/product/';
+const {width, height} = Dimensions.get('window');
 
 export default class TopProduct extends Component {
-    gotoDetail(product) {
-        const { navigator } = this.props;
-        navigator.push({ name: 'PRODUCT_DETAIL', product });
-    }
-    render() {
-        const { 
-            container, titleContainer, title, 
-            body, productContainer, productImage,
-            produceName, producePrice 
-        } = styles;
-        const { topProducts } = this.props;
-        return (
-            <View style={container}>
-                <View style={titleContainer}>
-                    <Text style={title}>TOP PRODUCT</Text>
-                </View>
-                
-                <ListView 
-                    contentContainerStyle={body}
-                    enableEmptySections
-                    dataSource={new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 }).cloneWithRows(topProducts)}
-                    renderRow={product => (
-                        <TouchableOpacity style={productContainer} onPress={() => this.gotoDetail(product)}>
-                            <Image source={{ uri: `${url}${product.images[0]}` }} style={productImage} />
-                            <Text style={produceName}>{product.name.toUpperCase()}</Text>
-                            <Text style={producePrice}>{product.price}$</Text>
-                        </TouchableOpacity>
-                    )}
-                    renderSeparator={(sectionId, rowId) => {
-                        if (rowId % 2 === 1) return <View style={{ width, height: 10 }} />;
-                        return null;
+  goToDetail(product) {
+    this.props.navigation.navigate('DetailProduct', {product: product});
+  }
+  render() {
+    return (
+      <View style={styles.Container}>
+        <View style={styles.title}>
+          <Text style={styles.textTile}>TOP PRODUCT</Text>
+        </View>
+        <View style={styles.body}>
+          <FlatList
+            columnWrapperStyle={{justifyContent: 'space-between'}}
+            numColumns={2}
+            data={this.props.TopProducts}
+            keyExtractor={(item) => item.id}
+            renderItem={({item, index}) => (
+              <TouchableOpacity
+                onPress={this.goToDetail.bind(this, item)}
+                key={item.id}>
+                <View style={styles.Product}>
+                  <Image
+                    source={{
+                      uri: `http://192.168.10.64/app/images/product/${item.images[0]}`,
                     }}
-                />
-            </View>
-        );
-    }
+                    style={styles.imageProduct}
+                  />
+                  <View style={styles.infoProduct}>
+                    <Text
+                      style={{
+                        flexWrap: 'wrap',
+                        width: 150,
+                      }}>
+                      {item.name}
+                    </Text>
+                    <Text style={styles.textProduct}>{item.price} $</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
+      </View>
+    );
+  }
 }
 
-const { width } = Dimensions.get('window');
-const produtWidth = (width - 60) / 2;
-const productImageHeight = (produtWidth / 361) * 452; 
+const productWidth = (width - 60) / 2;
+const productHeight = (productWidth / 361) * 452;
 
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor: '#fff',
-        margin: 10,
-        shadowColor: '#2E272B',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.2
+  Container: {
+    backgroundColor: 'white',
+    margin: 10,
+    paddingLeft: 10,
+    paddingRight: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
     },
-    titleContainer: {
-        height: 50,
-        justifyContent: 'center',
-        paddingLeft: 10
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+
+    elevation: 2,
+  },
+  title: {
+    height: height * 0.3 * 0.2,
+    justifyContent: 'center',
+    textAlignVertical: 'center',
+  },
+  textTile: {
+    fontSize: 20,
+  },
+  body: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    padding: 5,
+  },
+  Product: {
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
     },
-    title: {
-        color: '#D3D3CF',
-        fontSize: 20
-    },
-    body: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        flexWrap: 'wrap',
-        paddingBottom: 10
-    },
-    productContainer: {
-        width: produtWidth,
-        shadowColor: '#2E272B',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.2
-    },
-    productImage: {
-        width: produtWidth,
-        height: productImageHeight
-    },
-    produceName: {
-        marginVertical: 5,
-        paddingLeft: 10,
-        fontFamily: 'Avenir',
-        color: '#D3D3CF',
-        fontWeight: '500'
-    },
-    producePrice: {
-        marginBottom: 5,
-        paddingLeft: 10,
-        fontFamily: 'Avenir',
-        color: '#662F90'
-    }
+    shadowOpacity: 0.2,
+    shadowRadius: 0.1,
+
+    elevation: 0.5,
+
+    marginBottom: 10,
+    height: 330,
+  },
+  imageProduct: {
+    margin: 10,
+    width: productWidth,
+    height: productHeight,
+  },
+  infoProduct: {
+    marginLeft: 10,
+    justifyContent: 'space-between',
+    height: 70,
+  },
+  textProduct: {
+    color: 'green',
+  },
 });
-
-
-// https://github.com/vanpho93/LiveCodeReactNative
-
-/* 
-    <View style={body}>
-        {this.props.topProducts.map(e => (
-                <TouchableOpacity style={productContainer} onPress={() => this.gotoDetail(e)} key={e.id}>
-                <Image source={{ uri: `${url}${e.images[0]}` }} style={productImage} />
-                <Text style={produceName}>{e.name.toUpperCase()}</Text>
-                <Text style={producePrice}>{e.price}$</Text>
-            </TouchableOpacity>
-        ))}
-    </View>
-*/

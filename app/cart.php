@@ -1,22 +1,22 @@
 <?php
 //cart
 use \Firebase\JWT\JWT;
+
 require __DIR__ . '/vendor/autoload.php';
 include('function.php');
 include('connect/connect.php');
-	$json = file_get_contents('php://input');
-	$obj = json_decode($json, true);
-	$key = "example_key";
-	
-	$arrayDetail = $obj['arrayDetail'];
-	$token = $obj['token'];
+$json = file_get_contents('php://input');
+$obj = json_decode($json, true);
+$key = "example_key";
 
-try{
+$arrayDetail = $obj['arrayDetail'];
+$token = $obj['token'];
+
+try {
 	$decoded = JWT::decode($token, $key, array('HS256'));
-	if($decoded->expire < time()){
+	if ($decoded->expire < time()) {
 		echo 'HET_HAN';
-	}
-	else{
+	} else {
 		$email = $decoded->email;
 		$sql = "SELECT * FROM users where email = '$email'";
 		$result = $mysqli->query($sql);
@@ -42,12 +42,13 @@ try{
 			$price = $product['price'];
 			$sql = "INSERT INTO bill_detail(id_bill,id_product, quantity, price) VALUES ($id_bill, $value[id], $value[quantity], $price)";
 			$mysqli->query($sql);
-			
 		}
-		echo 'THEM_THANH_CONG';
+
+		$response = array("status"=>'THEM_THANH_CONG', "id_bill"=>$id_bill, "price"=>$price);
+		$response = json_encode($response);
+		echo $response;
 	}
-}
-catch(Exception $e){
+} catch (Exception $e) {
 	echo 'TOKEN_KHONG_HOP_LE';
 }
 
@@ -61,4 +62,3 @@ catch(Exception $e){
 			]
 		}');
 	*/
-?>

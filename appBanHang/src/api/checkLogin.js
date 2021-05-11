@@ -1,14 +1,11 @@
-const checkLogin = (token) => (
-    fetch('http://10.0.0.13/api/check_login.php',
-    {   
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json'
-        },
-        body: JSON.stringify({ token })
-    })
-    .then(res => res.json())
-);
+const checkLogin = (token) =>
+  fetch('http://192.168.10.64/app/check_login.php', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({token}),
+  }).then((response) => response.json());
 
-module.exports = checkLogin;
+export {checkLogin};

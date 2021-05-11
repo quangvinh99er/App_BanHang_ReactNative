@@ -1,70 +1,86 @@
-import React, { Component } from 'react';
-import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import React, {Component} from 'react';
+import {
+  Text,
+  StyleSheet,
+  View,
+  Dimensions,
+  ImageBackground,
+} from 'react-native';
 import Swiper from 'react-native-swiper';
 
-const { width } = Dimensions.get('window');
-const url = 'http://localhost/api/images/type/';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+const {width, height} = Dimensions.get('window');
 
 export default class Category extends Component {
-    gotoListProduct(category) {
-        const { navigator } = this.props;
-        navigator.push({ name: 'LIST_PRODUCT', category });
-    }
-    render() {
-        const { types } = this.props;
-        const { wrapper, textStyle, imageStyle, cateTitle } = styles;
-        const swiper = (
-            <Swiper showsPagination width={imageWidth} height={imageHeight} >
-                { types.map(e => (
-                    <TouchableOpacity onPress={() => this.gotoListProduct(e)} key={e.id}>
-                        <Image source={{ uri: `${url}${e.image}` }} style={imageStyle}>
-                            <Text style={cateTitle}>{e.name}</Text>
-                        </Image>
-                    </TouchableOpacity>
-                )) }
-            </Swiper>
-        );
-        return (
-            <View style={wrapper}>
-                <View style={{ justifyContent: 'center', height: 50 }}>
-                    <Text style={textStyle} >LIST OF CATEGORY</Text>
-                </View>
-                <View style={{ justifyContent: 'flex-end', flex: 4 }}>
-                    { types.length ? swiper : null }
-                </View>
-            </View>
-        );
-    }
+  goToListProduct(typeId, name) {
+    const {navigation} = this.props;
+    navigation.navigate('ListProduct', {
+      typeId: typeId,
+      name: name,
+      typeList: this.props.name, // cai nay dung trong viec xac dinh request nay la cua banner hay la cua category de lay url request cho phu hop
+    });
+  }
+  render() {
+    return (
+      <View style={styles.Wraper}>
+        <View style={styles.title}>
+          <Text style={styles.texTitleStyle}>LIST OF {this.props.name}</Text>
+        </View>
+        <View style={styles.banner}>
+          <Swiper autoplay={true} autoplayTimeout={10}>
+            {this.props.types.map((item) => (
+              <TouchableOpacity
+                onPress={this.goToListProduct.bind(this, item.id, item.name)}
+                key={item.id}>
+                <ImageBackground
+                  source={{
+                    uri: `http://192.168.10.64/app/images/${this.props.name}/${item.image}`,
+                  }}
+                  style={styles.imgStyle}></ImageBackground>
+              </TouchableOpacity>
+            ))}
+          </Swiper>
+        </View>
+      </View>
+    );
+  }
 }
-//933 x 465
-const imageWidth = width - 40;
-const imageHeight = imageWidth / 2;
 
+// sise of banner 933-465
+const imgWidth = width - 20;
+const imgHeight = (imgWidth / 933) * 465;
 const styles = StyleSheet.create({
-    wrapper: {
-        width: width - 20,
-        backgroundColor: '#FFF',
-        margin: 10,
-        justifyContent: 'space-between',
-        shadowColor: '#2E272B',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.2,
-        padding: 10,
-        paddingTop: 0
+  Wraper: {
+    height: height * 0.3,
+    backgroundColor: 'white',
+    margin: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
     },
-    textStyle: {
-        fontSize: 20,
-        color: '#AFAEAF'
-    },
-    imageStyle: {
-        height: imageHeight,
-        width: imageWidth,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    cateTitle: {
-        fontSize: 20,
-        fontFamily: 'Avenir',
-        color: '#9A9A9A'
-    }
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+
+    elevation: 2,
+    paddingLeft: 10,
+    paddingRight: 10,
+  },
+  title: {
+    flex: 2,
+    justifyContent: 'center',
+  },
+  banner: {
+    flex: 8,
+  },
+  imgStyle: {
+    width: imgWidth,
+    height: imgHeight,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  texTitleStyle: {
+    fontSize: 20,
+  },
+  cateTitle: {},
 });

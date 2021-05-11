@@ -1,16 +1,11 @@
-import { AsyncStorage } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const getCart = async () => {
-    try {
-        const value = await AsyncStorage.getItem('@cart');
-        if (value !== null) {
-            return JSON.parse(value);
-        }
-        return [];
-    } catch (error) {
-    // Error retrieving data
-        return [];
-    }
+  try {
+    const cartArray = await AsyncStorage.getItem('@cart');
+    return cartArray !== null ? JSON.parse(cartArray) : [];
+  } catch (e) {
+    return [];
+  }
 };
-
-export default getCart;
+export {getCart};

@@ -1,155 +1,195 @@
-import React, { Component } from 'react';
-import { View, Image, StyleSheet } from 'react-native';
-import TabNavigator from 'react-native-tab-navigator';
-import Header from './Header';
-import Home from './Home/Home';
-import Contact from './Contact/Contact';
+import React, {Component} from 'react';
+import {Dimensions, Image, StyleSheet} from 'react-native';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createStackNavigator} from '@react-navigation/stack';
 import Cart from './Cart/Cart';
+import Contact from './Contact/Contact';
+import Home from './Home/Home';
 import Search from './Search/Search';
-import global from '../../../components/global';
+import Header from '../../Header/Header';
+// import icon for tabs navigation
+import iconHome from '../../../media/appIcon/home.png';
+import iconHomeFocus from '../../../media/appIcon/home0.png';
 
-import initData from '../../../api/initData';
-import saveCart from '../../../api/saveCart';
-import getCart from '../../../api/getCart';
+import iconCart from '../../../media/appIcon/cart.png';
+import iconCartFocus from '../../../media/appIcon/cart0.png';
 
-import homeIconS from '../../../media/appIcon/home.png';
-import homeIcon from '../../../media/appIcon/home0.png';
-import cartIconS from '../../../media/appIcon/cart.png';
-import cartIcon from '../../../media/appIcon/cart0.png';
-import searchIconS from '../../../media/appIcon/search.png';
-import searchIcon from '../../../media/appIcon/search0.png';
-import contactIconS from '../../../media/appIcon/contact.png';
-import contactIcon from '../../../media/appIcon/contact0.png';
+import iconSearch from '../../../media/appIcon/search.png';
+import iconSearchFocus from '../../../media/appIcon/search0.png';
 
-class Shop extends Component {
-    constructor(props) {
-        super(props);
-        this.state = { 
-            selectedTab: 'home',
-            types: [],
-            topProducts: [],
-            cartArray: [] 
-        };
-        global.addProductToCart = this.addProductToCart.bind(this);
-        global.incrQuantity = this.incrQuantity.bind(this);
-        global.decrQuantity = this.decrQuantity.bind(this);
-        global.removeProduct = this.removeProduct.bind(this);
-        global.gotoSearch = this.gotoSearch.bind(this);
-    }
+import iconContact from '../../../media/appIcon/contact.png';
+import iconContactFocus from '../../../media/appIcon/contact0.png';
 
-    componentDidMount() {
-        initData()
-        .then(resJSON => {
-            const { type, product } = resJSON;
-            this.setState({ types: type, topProducts: product });
-        });
-        getCart()
-        .then(cartArray => this.setState({ cartArray }));
-    }
+import global from '../../global';
 
-    gotoSearch() {
-        this.setState({ selectedTab: 'search' });
-    }
+import {saveCart} from '../../../API/saveCart';
+import {getCart} from '../../../API/getCart';
 
-    addProductToCart(product) {
-        const isExist = this.state.cartArray.some(e => e.product.id === product.id);
-        if (isExist) return false;
-        this.setState(
-            { cartArray: this.state.cartArray.concat({ product, quantity: 1 }) }, 
-            () => saveCart(this.state.cartArray)
-        );
-    }
+// create stack navigation to use header
+const Stack = createStackNavigator();
+const shopStack = createStackNavigator();
+const Tab = createBottomTabNavigator();
 
-    incrQuantity(productId) {
-        const newCart = this.state.cartArray.map(e => {
-            if (e.product.id !== productId) return e;
-            return { product: e.product, quantity: e.quantity + 1 };
-        });
-        this.setState({ cartArray: newCart }, 
-            () => saveCart(this.state.cartArray)
-        );
-    }
+const {width, height} = Dimensions.get('window');
 
-    decrQuantity(productId) {
-        const newCart = this.state.cartArray.map(e => {
-            if (e.product.id !== productId) return e;
-            return { product: e.product, quantity: e.quantity - 1 };
-        });
-        this.setState({ cartArray: newCart }, 
-            () => saveCart(this.state.cartArray)
-        );
-    }
+const Home_Stack = (props) => {
+  return (
+    <Stack.Navigator headerMode="none">
+      <Stack.Screen name="Home" component={Home}></Stack.Screen>
+    </Stack.Navigator>
+  );
+};
 
-    removeProduct(productId) {
-        const newCart = this.state.cartArray.filter(e => e.product.id !== productId);
-        this.setState({ cartArray: newCart }, 
-            () => saveCart(this.state.cartArray)
-        );
-    }
-
-    openMenu() {
-        const { open } = this.props;
-        open();
-    }
-
-    render() {
-        const { iconStyle } = styles;
-        const { types, selectedTab, topProducts, cartArray } = this.state;
-        return (
-            <View style={{ flex: 1, backgroundColor: '#DBDBD8' }}>
-                <Header onOpen={this.openMenu.bind(this)} />
-                <TabNavigator>
-                    <TabNavigator.Item
-                        selected={selectedTab === 'home'}
-                        title="Home"
-                        onPress={() => this.setState({ selectedTab: 'home' })}
-                        renderIcon={() => <Image source={homeIcon} style={iconStyle} />}
-                        renderSelectedIcon={() => <Image source={homeIconS} style={iconStyle} />}
-                        selectedTitleStyle={{ color: '#34B089', fontFamily: 'Avenir' }}
-                    >
-                        <Home types={types} topProducts={topProducts} />
-                    </TabNavigator.Item>
-                    <TabNavigator.Item
-                        selected={selectedTab === 'cart'}
-                        title="Cart"
-                        onPress={() => this.setState({ selectedTab: 'cart' })}
-                        renderIcon={() => <Image source={cartIcon} style={iconStyle} />}
-                        renderSelectedIcon={() => <Image source={cartIconS} style={iconStyle} />}
-                        badgeText={cartArray.length}
-                        selectedTitleStyle={{ color: '#34B089', fontFamily: 'Avenir' }}
-                    >
-                        <Cart cartArray={cartArray} />
-                    </TabNavigator.Item>
-                    <TabNavigator.Item
-                        selected={selectedTab === 'search'}
-                        title="Search"
-                        onPress={() => this.setState({ selectedTab: 'search' })}
-                        renderIcon={() => <Image source={searchIcon} style={iconStyle} />}
-                        renderSelectedIcon={() => <Image source={searchIconS} style={iconStyle} />}
-                        selectedTitleStyle={{ color: '#34B089', fontFamily: 'Avenir' }}
-                    >
-                        <Search />
-                    </TabNavigator.Item>
-                    <TabNavigator.Item
-                        selected={selectedTab === 'contact'}
-                        title="Contact"
-                        onPress={() => this.setState({ selectedTab: 'contact' })}
-                        renderIcon={() => <Image source={contactIcon} style={iconStyle} />}
-                        renderSelectedIcon={() => <Image source={contactIconS} style={iconStyle} />}
-                        selectedTitleStyle={{ color: '#34B089', fontFamily: 'Avenir' }}
-                    >
-                        <Contact />
-                    </TabNavigator.Item>
-                </TabNavigator>
-            </View>
-        );
-    }
+function Cart_Stack(props) {
+  return (
+    <Stack.Navigator headerMode="none">
+      <Stack.Screen name="Cart">
+        {() => (
+          <Cart navigation={props.navigation} cartArray={props.cartArray} />
+        )}
+      </Stack.Screen>
+    </Stack.Navigator>
+  );
 }
 
-const styles = StyleSheet.create({
-    iconStyle: {
-        width: 20, height: 20
-    }
-});
+class Shop_Tabs extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {cartArray: []};
+    global.addProductToCart = this.addProductToCart.bind(this);
+    global.incrQuantity = this.incrQuantity.bind(this);
+    global.decrQuantity = this.decrQuantity.bind(this);
+    global.remmoveProduct = this.remmoveProduct.bind(this);
+    global.deleteOrder = this.deleteOrder.bind(this);
+  }
 
+  addProductToCart(product) {
+    let checkExist = false; // san pham chua co trong gio hang
+    this.state.cartArray.forEach((element) => {
+      if (element.product.id === product.id) {
+        {
+          checkExist = true;
+        }
+      }
+    });
+    if (!checkExist) {
+      this.setState(
+        {
+          cartArray: this.state.cartArray.concat({
+            product: product,
+            quatity: 1,
+          }),
+        },
+        () => {
+          saveCart(this.state.cartArray);
+        },
+      );
+    }
+  }
+  deleteOrder() {
+    this.setState({cartArray: []}, () => {
+      saveCart([]);
+    });
+  }
+  async incrQuantity(productId) {
+    const newCart = this.state.cartArray.map((e) => {
+      if (e.product.id !== productId) {
+        return e;
+      } else {
+        const newQuantity = e.quatity + 1;
+        return {product: e.product, quatity: newQuantity};
+      }
+    });
+    this.setState({cartArray: newCart}, () => {
+      saveCart(this.state.cartArray);
+    });
+  }
+  decrQuantity(productId) {
+    const newCart = this.state.cartArray.map((e) => {
+      if (e.product.id !== productId) {
+        return e;
+      } else {
+        const newQuantity = e.quatity > 1 ? e.quatity - 1 : e.quatity;
+        return {product: e.product, quatity: newQuantity};
+      }
+    });
+    this.setState({cartArray: newCart}, () => {
+      saveCart(this.state.cartArray);
+    });
+  }
+  remmoveProduct(productId) {
+    const newCart = this.state.cartArray.filter(
+      (element) => element.product.id !== productId,
+    );
+    this.setState({cartArray: newCart}, () => {
+      saveCart(this.state.cartArray);
+    });
+  }
+  componentDidMount() {
+    getCart().then((cartArray) => this.setState({cartArray: cartArray}));
+  }
+
+  render() {
+    const number = this.state.cartArray.length;
+    return (
+      <Tab.Navigator
+        screenOptions={({route}) => ({
+          tabBarIcon: ({focused, color, size}) => {
+            let icon;
+            if (route.name === 'Home') {
+              icon = focused ? iconHome : iconHomeFocus;
+            } else if (route.name === 'Cart') {
+              icon = focused ? iconCart : iconCartFocus;
+            } else if (route.name === 'Search') {
+              icon = focused ? iconSearch : iconSearchFocus;
+            } else if (route.name === 'Contact') {
+              icon = focused ? iconContact : iconContactFocus;
+            }
+            return <Image source={icon} style={styles.iconTabs} />;
+          },
+        })}
+        tabBarOptions={{
+          activeTintColor: '#2ABA99',
+          inactiveTintColor: 'gray',
+        }}>
+        <Tab.Screen name="Home" component={Home_Stack} />
+        <Tab.Screen
+          name="Cart"
+          options={{
+            tabBarBadge: number > 0 ? number : null,
+            tabBarBadgeStyle: {backgroundColor: '#0079FF'},
+          }}>
+          {(props) => (
+            <Cart_Stack cartArray={this.state.cartArray} {...this.props} />
+          )}
+        </Tab.Screen>
+        <Tab.Screen name="Search" component={Search} />
+        <Tab.Screen name="Contact" component={Contact} />
+      </Tab.Navigator>
+    );
+  }
+}
+class Shop extends Component {
+  render() {
+    return (
+      <shopStack.Navigator headerMode="screen">
+        <Stack.Screen
+          name="mainScreen"
+          component={Shop_Tabs}
+          options={{
+            header: (props) => {
+              return <Header {...props} />;
+            },
+          }}></Stack.Screen>
+      </shopStack.Navigator>
+    );
+  }
+}
 export default Shop;
+const styles = StyleSheet.create({
+  iconTabs: {
+    width: width / 14,
+    height: height / 24,
+    marginTop: 5,
+  },
+});

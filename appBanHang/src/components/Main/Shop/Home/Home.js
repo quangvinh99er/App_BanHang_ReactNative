@@ -1,26 +1,22 @@
-import React, { Component } from 'react';
-import { Navigator } from 'react-native';
+import React, {Component} from 'react';
+import {StatusBar, Text, View} from 'react-native';
+import {createStackNavigator} from '@react-navigation/stack';
 
 import HomeView from './HomeView';
-import ProductDetail from '../ProductDetail/ProductDetail';
-import ListProduct from '../ListProduct/ListProduct';
+import DetailProduct from '../../DetailProduct/DetailProduct';
+import ListProduct from '../../ListProduct/ListProduct';
+// create stack navigation to go to detail and home view
+const Stack = createStackNavigator();
 
-class Home extends Component {
-    render() {
-        const { types, topProducts } = this.props;
-        return (
-            <Navigator
-                initialRoute={{ name: 'HOME_VIEW' }}
-                renderScene={(route, navigator) => {
-                    switch (route.name) {
-                        case 'HOME_VIEW': return <HomeView navigator={navigator} types={types} topProducts={topProducts} />;
-                        case 'LIST_PRODUCT': return <ListProduct navigator={navigator} category={route.category} />;
-                        default: return <ProductDetail navigator={navigator} product={route.product} />;
-                    }
-                }}
-            />
-        );
-    }
+export class Home extends Component {
+  render() {
+    return (
+      <Stack.Navigator headerMode="none">
+        <Stack.Screen name="Home" component={HomeView} />
+        <Stack.Screen name="DetailProduct" component={DetailProduct} />
+        <Stack.Screen name="ListProduct" component={ListProduct} />
+      </Stack.Navigator>
+    );
+  }
 }
-
 export default Home;

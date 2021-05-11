@@ -1,12 +1,20 @@
-const getListProduct = (idType, page) => {
-    let url;
-    if (idType !== 'COLLECTION') {
-        url = `http://10.0.0.13/api/product_by_type.php?id_type=${idType}&page=${page}`;
+const getListProduct = (idType, page, nameIdType) => {
+  let url;
+
+  if (idType !== 'COLLECTION') {
+    if (nameIdType === 'CATEGORY') {
+      url = `http://192.168.10.64/app/product_by_type.php?id_type=${idType}&page=${page}`;
     } else {
-        url = `http://10.0.0.13/api/get_collection.php?page=${page}`;
+      url = `http://192.168.10.64/app/product_by_banner.php?id_type=${idType}&page=${page}`;
     }
-    return fetch(url)
-    .then(res => res.json());
+  }
+  return fetch(url, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+  }).then((res) => res.json());
 };
 
-export default getListProduct;
+export {getListProduct};

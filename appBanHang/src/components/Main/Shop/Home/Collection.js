@@ -1,49 +1,67 @@
-import React, { Component } from 'react';
-import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
-import bannerImage from '../../../../media/temp/banner.jpg';
+import React, {Component} from 'react';
+import {Text, StyleSheet, View, Dimensions, Image} from 'react-native';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
-const { width } = Dimensions.get('window');
+// need get from sever but now use img
+import imgCollection from '../../../../media/temp/banner.jpg';
+const {width, height} = Dimensions.get('window');
 
 export default class Collection extends Component {
-    gotoListProduct() {
-        const { navigator } = this.props;
-        navigator.push({ name: 'LIST_PRODUCT', category: { name: 'SPRING COLLECTION', id: 'COLLECTION' } });
-    }
-    render() {
-        const { wrapper, textStyle, imageStyle } = styles;
-        return (
-            <View style={wrapper}>
-                <View style={{ height: 50, justifyContent: 'center' }}>
-                    <Text style={textStyle} >SPRING COLLECTION</Text>
-                </View>
-                <TouchableOpacity style={{ flex: 4, justifyContent: 'flex-end' }} onPress={this.gotoListProduct.bind(this)}>
-                    <Image source={bannerImage} style={imageStyle} />
-                </TouchableOpacity>
-            </View>
-        );
-    }
+  gotoListProduct() {
+    const {navigation} = this.props;
+    navigation.navigate('ListProduct', {
+      typeId: 'COLLECTION',
+      name: 'SPRING COLLECTION',
+    });
+  }
+  render() {
+    return (
+      <View style={styles.Wraper}>
+        <View style={styles.title}>
+          <Text style={styles.texTitleStyle}>SPRING COLLECTION </Text>
+        </View>
+        <View style={styles.banner}>
+          <TouchableOpacity onPress={() => this.gotoListProduct()}>
+            <Image source={imgCollection} style={styles.imgStyle} />
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
 }
-//933 x 465
-const imageWidth = width - 40;
-const imageHeight = (imageWidth / 933) * 465;
 
+// sise of banner 933-465
+const imgWidth = width - 40;
+const imgHeight = height * 0.3 * (8 / 10) - 10;
 const styles = StyleSheet.create({
-    wrapper: {
-        width: width - 20,
-        backgroundColor: '#FFF',
-        margin: 10,
-        shadowColor: '#2E272B',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.2,
-        padding: 10,
-        paddingTop: 0
+  Wraper: {
+    height: height * 0.3,
+    backgroundColor: 'white',
+    margin: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
     },
-    textStyle: {
-        fontSize: 20,
-        color: '#AFAEAF'
-    },
-    imageStyle: {
-        height: imageHeight, 
-        width: imageWidth
-    }
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+
+    elevation: 2,
+    paddingLeft: 10,
+    paddingRight: 10,
+  },
+  title: {
+    flex: 2,
+    justifyContent: 'center',
+  },
+  banner: {
+    flex: 8,
+  },
+  imgStyle: {
+    width: imgWidth,
+    height: imgHeight,
+  },
+  texTitleStyle: {
+    fontSize: 20,
+  },
 });

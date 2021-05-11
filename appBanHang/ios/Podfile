@@ -12,6 +12,8 @@ target 'appBanHang' do
 
   pod 'react-native-maps', :path => '../node_modules/react-native-maps'
 
+  pod 'RNMomosdk', :path => '../node_modules/react-native-momosdk'
+
   target 'appBanHangTests' do
     inherit! :complete
     # Pods for testing

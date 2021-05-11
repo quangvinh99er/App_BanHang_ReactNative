@@ -1,16 +1,11 @@
-import { AsyncStorage } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const getToken = async () => {
-    try {
-        const value = await AsyncStorage.getItem('@token');
-        if (value !== null) {
-            return value;
-        }
-        return '';
-    } catch (error) {
-    // Error retrieving data
-        return '';
-    }
+  try {
+    const value = await AsyncStorage.getItem('@token');
+    return value !== null ? value : '';
+  } catch (e) {
+    return '';
+  }
 };
-
-export default getToken;
+export {getToken};
